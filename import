@@ -1,0 +1,107 @@
+#!/bin/bash
+
+#-----------------------------------------------------#
+# This file is intended to be included within scripts #
+#-----------------------------------------------------#
+
+
+#------#
+# Init #
+#------#
+
+IMPORT_SRC="import"
+__import_dbg_enabled=0
+
+
+#---------#
+# Imports #
+#---------#
+
+__import_dbg_print () {
+    msg="${1}"
+    if [ "${__import_dbg_enabled}" = 1 ]; then
+	printf "debug: ${msg}\n" >&1
+    fi
+}
+__import_dbg_print "entering import"
+
+
+#-----------------------#
+# External Dependencies #
+#-----------------------#
+
+#-------------------------------
+#
+# This file depends on an environment variable LIBRARY_FXNS to be set to a valid directory where all default
+#   library imports will take place.  This instantiation should be located in .bashrc or .bash_profile,
+#   and should have already been taken care of during installation.  However, if for some reason this
+#   variable wasn't set, or is erased when 'import' is called, this file assumes its default value
+#   of ${HOME}/library-fxns/
+#
+#-------------------------------
+
+
+#-----#
+# API #
+#-----#
+
+#-------------------------------
+#
+# Function: import <file>
+#
+# Arguments:
+#   <file> - The name of the file to import.  Currently the file is assumed to exist in
+#              ${HOME}/library-fxns/*
+#
+# Description: This function allows scripts to easily import each other by assuming certain
+#                naming conventions.
+#
+#-------------------------------
+
+
+#------------------#
+# Script Variables #
+#------------------#
+
+import_default_home="${HOME}/library-fxns"
+
+
+#-----------#
+# Functions #
+#-----------#
+
+import () {
+    local file="${1}"
+
+    if [ -z "${LIBRARY_FXNS+x}" ]; then
+	local LIBRARY_FXNS="${import_default_home}"
+    elif [ ! -d "${LIBRARY_FXNS}" ]; then
+	printf "'LIBRARY_FXNS' doesn't point to a valid directory\n" >&2
+	exit 1
+    fi
+    
+    if [ ! -f "${LIBRARY_FXNS}/${file}" ] && [ ! -f "${file}" ]; then
+	printf "imported file (${1}) doesn't exist\n" >&2
+	exit 1
+    fi    
+
+    local e="$((${#file}-5))"
+    if [ "${file:${e}:5}" = ".blib" ]; then
+	file="${file:0:${e}}"
+    fi
+
+    local src=$(basename "${file}" | tr '[:lower:]' '[:upper:]')"_SRC"
+    if [ -z "${!src+x}" ]; then
+	if [ -f "${LIBRARY_FXNS}/${file}" ]; then
+	    __import_dbg_print "importing ${LIBRARY_FXNS}/${file}"
+	    source "${LIBRARY_FXNS}/${file}"
+	else # [ -f "${file}" ]; then
+	    __import_dbg_print "importing ${file}"
+	    source "${file}"
+	fi
+    else
+	__import_dbg_print "${LIBRARY_FXNS}/${file} has already been imported"
+    fi
+}
+
+__import_dbg_print "exiting import"
