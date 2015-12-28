@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /bin/bash
 
 #-----------------------------------------------------#
 # This file is intended to be included within scripts #
@@ -11,10 +11,10 @@
 CONFIG_UTILS_SRC=
 __cu_debug_enabled=0
 __cu_debug_print () {
-    local msg="${1}"
-    if [ "${__log_debug_enabled}" = 1 ]; then
-	printf "debug: ${msg}\n" >&1
-    fi
+  local msg="${1}"
+  if [ "${__log_debug_enabled}" = 1 ]; then
+    printf "debug: ${msg}\n" >&1
+  fi
 }
 __cu_debug_print "entering config_utils"
 
@@ -23,7 +23,7 @@ __cu_debug_print "entering config_utils"
 #---------#
 
 if [ -z "${IMPORT_SRC+x}" ]; then
-    source "${import_default_home}/import"
+  source "${import_default_home}/import"
 fi
 import "file_exists"
 import "log"
@@ -125,80 +125,80 @@ __cu_inv_throw=105
 #-----------#
 
 cu_get_value () {
-    __cu_validate_name "${1}"
-    local name="${__config_utils_res}"
-    local file=
-    local throw=
+  __cu_validate_name "${1}"
+  local name="${__config_utils_res}"
+  local file=
+  local throw=
+  
+  while [ "$#" != 1 ]; do
+    if [ ! ${2##file=*} ]; then
+      file="${2/file=/}"
+      __cu_validate_optional_file "${file}"
+      file="${__config_utils_res}"
+      elif [ ! ${2##throw-error=*} ]; then
+      throw="${2/throw-error=/}"
+      __cu_validate_throw "${throw}"
+      throw="${__config_utils_res}"
+    else #improper argument supplied
+      log_fatal "Invalid argument '${2}' was supplied." ${__cu_inv_argument}
+    fi
     
-    while [ "$#" != 1 ]; do
-	if [ ! ${2##file=*} ]; then
-	    file="${2/file=/}"
-	    __cu_validate_optional_file "${file}"
-	    file="${__config_utils_res}"
-	elif [ ! ${2##throw-error=*} ]; then
-	    throw="${2/throw-error=/}"
-	    __cu_validate_throw "${throw}"
-	    throw="${__config_utils_res}"
-	else #improper argument supplied
-	    log_fatal "Invalid argument '${2}' was supplied." ${__cu_inv_argument}
-	fi
-	
-	shift	
-    done
-
-    if [ "${file}" = "" ] && [ "${cu_persistent_file}" = "" ]; then
-	log_fatal "file argument is needed if 'cu_persistent_file' is not set" ${__cu_need_opt_file}
+    shift
+  done
+  
+  if [ "${file}" = "" ] && [ "${cu_persistent_file}" = "" ]; then
+    log_fatal "file argument is needed if 'cu_persistent_file' is not set" ${__cu_need_opt_file}
     elif [ "${file}" = "" ]; then
-	file="${cu_persistent_file}"
-    fi
-    
-    result=$(sed -n -e "s/^${name}=\(.*\)/\1/p" "${file}")
-    if [ "${throw}" = "true" ] && [ "${result}" = "" ]; then
-	log_fatal "Could not find name: '${name}' in file: '${file}'." ${__cu_name_not_found}
-    fi
-    config_utils_result="${result}"
+    file="${cu_persistent_file}"
+  fi
+  
+  result=$(sed -n -e "s/^${name}=\(.*\)/\1/p" "${file}")
+  if [ "${throw}" = "true" ] && [ "${result}" = "" ]; then
+    log_fatal "Could not find name: '${name}' in file: '${file}'." ${__cu_name_not_found}
+  fi
+  config_utils_result="${result}"
 }
 
 cu_set_name_value () {
-    __cu_validate_name "${1}"
-    local name="${__config_utils_res}"
-
-    if [ -z "${2+x}" ]; then
-	log_fatal "<value> wasn't provided" ${__cu_val_not_given}
-    fi
-    local val="${2}"
-    
-    __cu_validate_optional_file "${3}"
-    local file="${__config_utils_res}"
-
-    # find name in file
-    local found=$(sed -n -e "/^${name}=/p" "${file}")
-
-    # if found is not empty (and thus the name _was_ found)
-    if [ "${found}" != "" ]; then
-	local sedName="${name//\//\\\/}"
-	local sedVal="${val//\//\\\/}"
-	sed -i "s/${sedName}=.*/${sedName}=${sedVal}/" "${file}"
-    else
-	printf "${name}=${val}\n" >> "${file}"
-    fi
+  __cu_validate_name "${1}"
+  local name="${__config_utils_res}"
+  
+  if [ -z "${2+x}" ]; then
+    log_fatal "<value> wasn't provided" ${__cu_val_not_given}
+  fi
+  local val="${2}"
+  
+  __cu_validate_optional_file "${3}"
+  local file="${__config_utils_res}"
+  
+  # find name in file
+  local found=$(sed -n -e "/^${name}=/p" "${file}")
+  
+  # if found is not empty (and thus the name _was_ found)
+  if [ "${found}" != "" ]; then
+    local sedName="${name//\//\\\/}"
+    local sedVal="${val//\//\\\/}"
+    sed -i "s/${sedName}=.*/${sedName}=${sedVal}/" "${file}"
+  else
+    printf "${name}=${val}\n" >> "${file}"
+  fi
 }
 
 cu_remove_name () {
-    __cu_validate_name "${1}"
-    local name="${__config_utils_res}"
-    
-    local sedName="${name//\//\\\/}"
-    
-    __cu_validate_optional_file "${2}"
-    local file="${__config_utils_res}"
-    
-    sed -i "/${sedName}=/d" "${file}" 1>/dev/null
+  __cu_validate_name "${1}"
+  local name="${__config_utils_res}"
+  
+  local sedName="${name//\//\\\/}"
+  
+  __cu_validate_optional_file "${2}"
+  local file="${__config_utils_res}"
+  
+  sed -i "/${sedName}=/d" "${file}" 1>/dev/null
 }
 
 cu_set_persistent_file () {
-    __cu_validate_file "${1}"    
-    cu_persistent_file="${__config_utils_res}"
+  __cu_validate_file "${1}"
+  cu_persistent_file="${__config_utils_res}"
 }
 
 #------------------#
@@ -206,54 +206,54 @@ cu_set_persistent_file () {
 #------------------#
 
 __cu_validate_name () {
-    if [ "${1}" = "" ]; then
-	log_fatal "<name> wasn't provided" ${__cu_inv_name}
-    fi
-    
-    __config_utils_res="${1}"
+  if [ "${1}" = "" ]; then
+    log_fatal "<name> wasn't provided" ${__cu_inv_name}
+  fi
+  
+  __config_utils_res="${1}"
 }
 
 __cu_validate_file () {
-    if [ "${1}" = "" ]; then
-	log_fatal "<file> wasn't provided" ${__cu_file_not_provided}
+  if [ "${1}" = "" ]; then
+    log_fatal "<file> wasn't provided" ${__cu_file_not_provided}
     elif ! file_exists "${1}"; then
-	log_fatal "file: '${1}' doesn't exist" ${__cu_file_not_exist}
-    fi
-
-    __config_utils_res="$(realpath "${1}")"
+    log_fatal "file: '${1}' doesn't exist" ${__cu_file_not_exist}
+  fi
+  
+  __config_utils_res="$(realpath "${1}")"
 }
 
 __cu_validate_optional_file () {
-    local file=
-    local tmpError=
-    
-    # error cases
-    if [ "${1}" != "" ] && ! file_exists "${1}"; then
-	log_fatal "file argument '${1}' is not valid" ${__cu_inv_opt_file}
+  local file=
+  local tmpError=
+  
+  # error cases
+  if [ "${1}" != "" ] && ! file_exists "${1}"; then
+    log_fatal "file argument '${1}' is not valid" ${__cu_inv_opt_file}
     elif [ "${1}" = "" ] && [ "${config_utils_persistent_file+x}" = "" ]; then
-	log_fatal "file argument is needed if 'cu_persistent_file' is not set" ${__cu_need_opt_file}
-    fi
-    
-    if [ "${1}" = "" ]; then
-	file="${cu_persistent_file}"
-    else # passed in file must be valid
-	file="$(realpath "${1}")"
-    fi
-    
-    __config_utils_res="${file}"
+    log_fatal "file argument is needed if 'cu_persistent_file' is not set" ${__cu_need_opt_file}
+  fi
+  
+  if [ "${1}" = "" ]; then
+    file="${cu_persistent_file}"
+  else # passed in file must be valid
+    file="$(realpath "${1}")"
+  fi
+  
+  __config_utils_res="${file}"
 }
 
 __cu_validate_throw () {
-    local result="false"
-    if [ "${1}" = "true" ]; then
-	result="true"
+  local result="false"
+  if [ "${1}" = "true" ]; then
+    result="true"
     elif [ "${1}" != "" ] && [ "${1}" != "false" ]; then
-	local msg="[throw-error] was supplied to function '${FUNCNAME[1]}', but is invalid"
-	msg="${msg} (given: '${1}').  This parameter must be 'true' or 'false'."
-	log_fatal "${msg}" ${__cu_inv_throw}
-    fi
-
-    __config_utils_res="${result}"
+    local msg="[throw-error] was supplied to function '${FUNCNAME[1]}', but is invalid"
+    msg="${msg} (given: '${1}').  This parameter must be 'true' or 'false'."
+    log_fatal "${msg}" ${__cu_inv_throw}
+  fi
+  
+  __config_utils_res="${result}"
 }
 
 __cu_debug_print "exiting config_utils"

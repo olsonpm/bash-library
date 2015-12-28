@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /bin/bash
 
 #-----------------------------------------------------#
 # This file is intended to be included within scripts #
@@ -18,10 +18,10 @@ __import_dbg_enabled=0
 #---------#
 
 __import_dbg_print () {
-    msg="${1}"
-    if [ "${__import_dbg_enabled}" = 1 ]; then
-	printf "debug: ${msg}\n" >&1
-    fi
+  msg="${1}"
+  if [ "${__import_dbg_enabled}" = 1 ]; then
+    printf "debug: ${msg}\n" >&1
+  fi
 }
 __import_dbg_print "entering import"
 
@@ -71,37 +71,37 @@ import_default_home="${HOME}/library-fxns"
 #-----------#
 
 import () {
-    local file="${1}"
+  local file="${1}"
 
-    if [ -z "${LIBRARY_FXNS+x}" ]; then
-	local LIBRARY_FXNS="${import_default_home}"
+  if [ -z "${LIBRARY_FXNS+x}" ]; then
+    local LIBRARY_FXNS="${import_default_home}"
     elif [ ! -d "${LIBRARY_FXNS}" ]; then
-	printf "'LIBRARY_FXNS' doesn't point to a valid directory\n" >&2
-	exit 1
-    fi
-    
-    if [ ! -f "${LIBRARY_FXNS}/${file}" ] && [ ! -f "${file}" ]; then
-	printf "imported file (${1}) doesn't exist\n" >&2
-	exit 1
-    fi    
+    printf "'LIBRARY_FXNS' doesn't point to a valid directory\n" >&2
+    exit 1
+  fi
 
-    local e="$((${#file}-5))"
-    if [ "${file:${e}:5}" = ".blib" ]; then
-	file="${file:0:${e}}"
-    fi
+  if [ ! -f "${LIBRARY_FXNS}/${file}" ] && [ ! -f "${file}" ]; then
+    printf "imported file (${1}) doesn't exist\n" >&2
+    exit 1
+  fi
 
-    local src=$(basename "${file}" | tr '[:lower:]' '[:upper:]')"_SRC"
-    if [ -z "${!src+x}" ]; then
-	if [ -f "${LIBRARY_FXNS}/${file}" ]; then
-	    __import_dbg_print "importing ${LIBRARY_FXNS}/${file}"
-	    source "${LIBRARY_FXNS}/${file}"
-	else # [ -f "${file}" ]; then
-	    __import_dbg_print "importing ${file}"
-	    source "${file}"
-	fi
-    else
-	__import_dbg_print "${LIBRARY_FXNS}/${file} has already been imported"
+  local e="$((${#file}-5))"
+  if [ "${file:${e}:5}" = ".blib" ]; then
+    file="${file:0:${e}}"
+  fi
+
+  local src=$(basename "${file}" | tr '[:lower:]' '[:upper:]')"_SRC"
+  if [ -z "${!src+x}" ]; then
+    if [ -f "${LIBRARY_FXNS}/${file}" ]; then
+      __import_dbg_print "importing ${LIBRARY_FXNS}/${file}"
+      source "${LIBRARY_FXNS}/${file}"
+    else # [ -f "${file}" ]; then
+      __import_dbg_print "importing ${file}"
+      source "${file}"
     fi
+  else
+    __import_dbg_print "${LIBRARY_FXNS}/${file} has already been imported"
+  fi
 }
 
 __import_dbg_print "exiting import"

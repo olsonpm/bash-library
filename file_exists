@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /bin/bash
 
 #-----------------------------------------------------#
 # This file is intended to be included within scripts #
@@ -12,10 +12,10 @@
 FILE_EXISTS_SRC=
 __fe_debug_enabled=0
 __fe_debug_print () {
-    local msg="${1}"
-    if [ "${__log_debug_enabled}" = 1 ]; then
-	printf "debug: ${msg}\n" >&1
-    fi
+  local msg="${1}"
+  if [ "${__log_debug_enabled}" = 1 ]; then
+    printf "debug: ${msg}\n" >&1
+  fi
 }
 __fe_debug_print "entering file_exists"
 
@@ -25,7 +25,7 @@ __fe_debug_print "entering file_exists"
 #---------#
 
 if [ -z "${IMPORT_SRC+x}" ]; then
-    source "${LIBRARY_FXNS}/import"
+  source "${LIBRARY_FXNS}/import"
 fi
 import "log"
 
@@ -53,20 +53,20 @@ import "log"
 #-----------#
 
 file_exists () {
-    if [ -z ${1+x} ]; then
-	log_fatal "'file_exists' was not given any arguments." 3
-    fi
-    
-    local file="${1}"
-    local tmp=0
-    
-    if [ ! -e "${file}" ]; then
-	tmp=2
+  if [ -z ${1+x} ]; then
+    log_fatal "'file_exists' was not given any arguments." 3
+  fi
+  
+  local file="${1}"
+  local tmp=0
+  
+  if [ ! -e "${file}" ]; then
+    tmp=2
     elif [ -L "${file}" ] && [ ! -e $(realpath "${file}") ]; then
-	tmp=1
-    fi
-
-    return $tmp
+    tmp=1
+  fi
+  
+  return $tmp
 }
 
 __fe_debug_print "exiting file_exists"
