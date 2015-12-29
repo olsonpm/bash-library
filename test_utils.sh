@@ -3,6 +3,18 @@
 
 TEST_UTILS_SRC=1
 
+#---------#
+# Imports #
+#---------#
+
+currentDir="$( cd "$( dirname "${0}" )" && pwd )"
+if [ -z "${IMPORT_SRC+x}" ]; then
+  . "${currentDir}/import.sh"
+fi
+import colors
+
+
+
 #-----#
 # API #
 #-----#
@@ -94,9 +106,9 @@ tu_init () {
 }
 
 tu_finalize () {
-  printf "\n# Tests: %b\n" "${__tu_total_tests}"
-  printf "# Successes: %b\n" "${__tu_total_successes}"
-  printf "# Failures: %b\n\n" "${__tu_total_failures}"
+  printf "\n%b# Tests:%b %b\n" "${CYAN}" "${RESET}" "${__tu_total_tests}"
+  printf "%b# Successes:%b %b\n" "${CYAN}" "${RESET}"  "${__tu_total_successes}"
+  printf "%b# Failures:%b %b\n\n" "${CYAN}" "${RESET}"  "${__tu_total_failures}"
   __tu_total_tests=""
   __tu_total_successes=""
   __tu_total_failures=""
@@ -113,10 +125,10 @@ tu_assert_success () {
   local tstDesc="${__test_utils_res}"
   
   if (${call} >/dev/null 2>&1); then
-    __tu_pretty_print_test "success" "${fxnName}" "${tstDesc}"
+    __tu_pretty_print_test "${GREEN}success${RESET}" "${fxnName}" "${tstDesc}"
     __tu_increment_successes
   else
-    __tu_pretty_print_test "failed " "${fxnName}" "${tstDesc}"
+    __tu_pretty_print_test "${RED}failed ${RESET}" "${fxnName}" "${tstDesc}"
     __tu_increment_failures
   fi
 }
@@ -132,10 +144,10 @@ tu_assert_error () {
   local tstDesc="${__test_utils_res}"
   
   if ! (${call} >/dev/null 2>&1); then
-    __tu_pretty_print_test "success" "${fxnName}" "${tstDesc}"
+    __tu_pretty_print_test "${GREEN}success${RESET}" "${fxnName}" "${tstDesc}"
     __tu_increment_successes
   else
-    __tu_pretty_print_test "failed " "${fxnName}" "${tstDesc}"
+    __tu_pretty_print_test "${RED}failed ${RESET}" "${fxnName}" "${tstDesc}"
     __tu_increment_failures
   fi
 }
@@ -155,10 +167,10 @@ tu_assert_errno () {
   
   (${call} >/dev/null 2>&1)
   if [ "${?}" = "${errno}" ]; then
-    __tu_pretty_print_test "success" "${fxnName}" "${tstDesc}"
+    __tu_pretty_print_test "${GREEN}success${RESET}" "${fxnName}" "${tstDesc}"
     __tu_increment_successes
   else
-    __tu_pretty_print_test "failed " "${fxnName}" "${tstDesc}"
+    __tu_pretty_print_test "${RED}failed ${RESET}" "${fxnName}" "${tstDesc}"
     __tu_increment_failures
   fi
 }
@@ -218,7 +230,8 @@ __tu_validate_test_description () {
 }
 
 __tu_print_headers () {
-  printf "\nStatus      Function Name                 Test Description\n"
+  printf "\n%bStatus%b      %bFunction Name%b                 %bTest Description%b\n" \
+  "${YELLOW}" "${RESET}" "${YELLOW}" "${RESET}" "${YELLOW}" "${RESET}"
   printf -- "------      -------------                 ----------------\n"
 }
 
