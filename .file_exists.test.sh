@@ -1,11 +1,8 @@
-#! /bin/bash
+#! /usr/bin/env sh
 
-#---------------------------#
-# Test file for file_exists #
-#---------------------------#
 
 if [ -z "${IMPORT_SRC+x}" ]; then
-  source "${LIBRARY_FXNS}/import"
+  . "${LIBRARY_FXNS}/import"
 fi
 import "file_exists"
 import "test_utils"

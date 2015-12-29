@@ -1,8 +1,4 @@
-#! /bin/bash
-
-#-----------------------------------------------------#
-# This file is intended to be included within scripts #
-#-----------------------------------------------------#
+#! /usr/bin/env sh
 
 
 #------#
@@ -14,7 +10,7 @@ __fe_debug_enabled=0
 __fe_debug_print () {
   local msg="${1}"
   if [ "${__log_debug_enabled}" = 1 ]; then
-    printf "debug: ${msg}\n" >&1
+    printf "debug: %b\n" "${msg}" >&1
   fi
 }
 __fe_debug_print "entering file_exists"
@@ -25,7 +21,7 @@ __fe_debug_print "entering file_exists"
 #---------#
 
 if [ -z "${IMPORT_SRC+x}" ]; then
-  source "${LIBRARY_FXNS}/import"
+  . "${LIBRARY_FXNS}/import"
 fi
 import "log"
 
@@ -62,7 +58,7 @@ file_exists () {
   
   if [ ! -e "${file}" ]; then
     tmp=2
-    elif [ -L "${file}" ] && [ ! -e $(realpath "${file}") ]; then
+    elif [ -L "${file}" ] && [ ! -e "$(realpath "${file}")" ]; then
     tmp=1
   fi
   

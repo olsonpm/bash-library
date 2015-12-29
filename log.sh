@@ -1,8 +1,4 @@
-#! /bin/bash
-
-#-----------------------------------------------------#
-# This file is intended to be included within scripts #
-#-----------------------------------------------------#
+#! /usr/bin/env sh
 
 
 #------#
@@ -14,7 +10,7 @@ __log_debug_enabled=0
 __log_debug_print () {
   local msg="${1}"
   if [ "${__log_debug_enabled}" = 1 ]; then
-    printf "debug: ${msg}\n" >&1
+    printf "debug: %b\n" "${msg}" >&1
   fi
 }
 __log_debug_print "entering log"
@@ -25,7 +21,7 @@ __log_debug_print "entering log"
 #---------#
 
 if [ -z "${IMPORT_SRC+x}" ]; then
-  source "${LIBRARY_FXNS}/import"
+  . "${LIBRARY_FXNS}/import"
 fi
 import "config_utils"
 
@@ -129,7 +125,7 @@ log () {
   __log_get_label "${lvl}"
   local label="${__log_res}"
   
-  __log_validate_message "${2}"
+  __log_validate_message "log" "${2}"
   local msg="${__log_res}"
   
   msg="${label}: ${msg}\n"
@@ -137,29 +133,26 @@ log () {
   local stdout_level="${__log_res}"
   
   if [ "${lvl}" = 5 ]; then
-    printf "${msg}" >&2
+    printf "%b" "${msg}" >&2
     elif [ "${lvl}" -ge "${stdout_level}" ]; then
-    printf "${msg}" >&1
+    printf "%b" "${msg}" >&1
   fi
 }
 
 log_fatal () {
-  __log_validate_message "${1}"
+  __log_validate_message "log_fatal" "${1}"
   local msg="${__log_fatal}: ${__log_res}"
   
   __log_validate_errno "${2}"
   local errno="${__log_res}"
   
-  __log_get_stacktrace
-  local result="${msg}\nStack Trace\n-----------\n${__log_res}"
-  
-  printf "${result}" >&2
+  printf "%b" "${result}" >&2
   exit "${errno}"
 }
 
 log_print_stdout_level () {
   __log_get_stdout_level
-  printf "Current stdout log level: ${__log_res}\n" >&1
+  printf "Current stdout log level: %b\n" "${__log_res}" >&1
 }
 
 log_set_stdout_level () {
@@ -170,7 +163,7 @@ log_set_stdout_level () {
   cu_set_name_value "${__log_stdout_name}" "${level}" "${__log_conf}"
   
   if [ "${debug_enabled}" = 1 ]; then
-    printf "stdout_level=${level}\n" >&1
+    printf "stdout_level=%b\n" "${level}" >&1
   fi
 }
 
@@ -186,10 +179,10 @@ __log_validate_stdout_level () {
     printf "stdout level wasn't provided\n" >&2
     exit 1
     elif [ ! "${level}" -eq "${level}" ]; then
-    printf "${__log_fatal}: level must be an integer between 1 and 5\n" >&2
+    printf "%b: level must be an integer between 1 and 5\n" "${__log_fatal}" >&2
     exit 1
     elif [ "${level}" -lt 1 ] || [ "${level}" -gt 5 ]; then
-    printf "${__log_error}: message level cannot be less than 1 nor greater than 5 - defaulting to 5\n" >&2
+    printf "%b: message level cannot be less than 1 nor greater than 5 - defaulting to 5\n" "${__log_error}" >&2
     level=5
   fi
   
@@ -200,7 +193,7 @@ __log_validate_message_level () {
   local level="${1}"
   
   if [ "${level}" -lt 1 ] || [ "${level}" -gt 5 ]; then
-    printf "${__log_error}: message level cannot be less than 1 nor greater than 5 - defaulting to 5\n" >&2
+    printf "%b: message level cannot be less than 1 nor greater than 5 - defaulting to 5\n" "${__log_error}" >&2
     level=5
   fi
   
@@ -208,8 +201,9 @@ __log_validate_message_level () {
 }
 
 __log_validate_message () {
-  if [ -z "${1+x}" ] || [ "${1}" = "" ]; then
-    printf "${__log_fatal}: '${FUNCNAME[1]}' was called without a message argument.\n" >&2
+  local fnName="${1}"
+  if [ -z "${2+x}" ] || [ "${2}" = "" ]; then
+    printf "%b: '${fnName}' was called without a message argument.\n" "${__log_fatal}" >&2
     exit 1
   fi
   
@@ -221,11 +215,11 @@ __log_validate_errno () {
   if [ "${1}" -eq "${1}" ] 2>/dev/null && [ ! "${1}" = "0" ] ; then
     errno="${1}"
     if [ "${1}" -gt 255 ] || [ "${1}" -lt 1 ]; then
-      printf "${__log_warning}: '${FUNCNAME[1]}' was called with an errno" >&1
+      printf "%b: 'log_fatal' was called with an errno" "${__log_warning}" >&1
       printf " greater than 255 or less than 1.  This may invoke an unexpected exit code.\n" >&1
     fi
     elif [ ! "${1}" = "" ]; then
-    printf "${__log_fatal}: '${FUNCNAME[1]}' was called with an invalid errno: '${1}'.\n" >&2
+    printf "%b: 'log_fatal' was called with an invalid errno: '%b'.\n" "${__log_fatal}" "${1}" >&2
     exit 1
   fi
   
@@ -242,7 +236,7 @@ __log_get_label () {
     5) label="${__log_error}" ;;
     6) label="${__log_fatal}" ;;
     *)
-      printf "${__log_fatal}: '${FUNCNAME[1]}' was called with an invalid level: '${1}'.\n" >&2
+      printf "%b: 'log' was called with an invalid level: '${1}'.\n" "${__log_fatal}" >&2
     ;;
   esac
   
@@ -266,26 +260,6 @@ __log_get_stdout_level () {
   fi
   
   __log_res="${level}"
-}
-
-__log_get_stacktrace () {
-  local fxn=
-  local line=
-  local src=
-  local stack=
-  
-  for i in $(seq 1 $((${#FUNCNAME[@]} - 1))); do
-    fxn="${FUNCNAME[$i]}"
-    if [ $i = 0 ]; then
-      line=$LINENO
-    else
-      line="${BASH_LINENO[$((i-1))]}"
-    fi
-    src="${BASH_SOURCE[$i]}"
-    stack="${stack}Frame: $i\nSource: ${src}\nFunction: ${fxn}\nLine: ${line}\n\n"
-  done
-  
-  __log_res="${stack}"
 }
 
 

@@ -1,8 +1,5 @@
-#! /bin/bash
+#! /usr/bin/env sh
 
-#-----------------------------------------------------#
-# This file is intended to be included within scripts #
-#-----------------------------------------------------#
 
 #------#
 # Init #
@@ -13,7 +10,7 @@ __cu_debug_enabled=0
 __cu_debug_print () {
   local msg="${1}"
   if [ "${__log_debug_enabled}" = 1 ]; then
-    printf "debug: ${msg}\n" >&1
+    printf "debug: %b\n" "${msg}" >&1
   fi
 }
 __cu_debug_print "entering config_utils"
@@ -23,7 +20,7 @@ __cu_debug_print "entering config_utils"
 #---------#
 
 if [ -z "${IMPORT_SRC+x}" ]; then
-  source "${import_default_home}/import"
+  . "${import_default_home}/import"
 fi
 import "file_exists"
 import "log"
@@ -132,11 +129,11 @@ cu_get_value () {
   
   while [ "$#" != 1 ]; do
     if [ ! ${2##file=*} ]; then
-      file="${2/file=/}"
+      file="$(printf "%b" "${2}" | sed -e 's/^file=(.*)$/\1/g')"
       __cu_validate_optional_file "${file}"
       file="${__config_utils_res}"
       elif [ ! ${2##throw-error=*} ]; then
-      throw="${2/throw-error=/}"
+      throw="$(printf "%b" "${2}" | sed -e 's/^throw-error=(.*)$/\1/g')"
       __cu_validate_throw "${throw}"
       throw="${__config_utils_res}"
     else #improper argument supplied
@@ -176,11 +173,11 @@ cu_set_name_value () {
   
   # if found is not empty (and thus the name _was_ found)
   if [ "${found}" != "" ]; then
-    local sedName="${name//\//\\\/}"
-    local sedVal="${val//\//\\\/}"
+    local sedName="$(printf "%b" "${name}" | sed -e 's/\//\\\//g')"
+    local sedVal="$(printf "%b" "${val}" | sed -e 's/\//\\\//g')"
     sed -i "s/${sedName}=.*/${sedName}=${sedVal}/" "${file}"
   else
-    printf "${name}=${val}\n" >> "${file}"
+    printf "%b=%b\n" "${name}" "${val}" >> "${file}"
   fi
 }
 
@@ -188,7 +185,7 @@ cu_remove_name () {
   __cu_validate_name "${1}"
   local name="${__config_utils_res}"
   
-  local sedName="${name//\//\\\/}"
+  local sedName="$(printf "%b" "${name}" | sed -e 's/\//\\\//g')"
   
   __cu_validate_optional_file "${2}"
   local file="${__config_utils_res}"
@@ -248,7 +245,7 @@ __cu_validate_throw () {
   if [ "${1}" = "true" ]; then
     result="true"
     elif [ "${1}" != "" ] && [ "${1}" != "false" ]; then
-    local msg="[throw-error] was supplied to function '${FUNCNAME[1]}', but is invalid"
+    local msg="[throw-error] was supplied but is invalid"
     msg="${msg} (given: '${1}').  This parameter must be 'true' or 'false'."
     log_fatal "${msg}" ${__cu_inv_throw}
   fi

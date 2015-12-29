@@ -1,8 +1,4 @@
-#! /bin/bash
-
-#-----------------------------------------------------#
-# This file is intended to be included within scripts #
-#-----------------------------------------------------#
+#! /usr/bin/env sh
 
 
 #------#
@@ -104,9 +100,9 @@ tu_init () {
 }
 
 tu_finalize () {
-  printf "\n# Tests: ${__tu_total_tests}\n"
-  printf "# Successes: ${__tu_total_successes}\n"
-  printf "# Failures: ${__tu_total_failures}\n\n"
+  printf "\n# Tests: %b\n" "${__tu_total_tests}"
+  printf "# Successes: %b\n" "${__tu_total_successes}"
+  printf "# Failures: %b\n\n" "${__tu_total_failures}"
   __tu_total_tests=""
   __tu_total_successes=""
   __tu_total_failures=""
@@ -124,7 +120,7 @@ tu_assert_success () {
   
   
   #if (${call}); then
-  if (${call} &>/dev/null); then
+  if (${call} >/dev/null 2>&1); then
     __tu_pretty_print_test "success" "${fxnName}" "${tstDesc}"
     __tu_increment_successes
   else
@@ -144,7 +140,7 @@ tu_assert_error () {
   local tstDesc="${__test_utils_res}"
   
   #if ! (${call}); then
-  if ! (${call} &>/dev/null); then
+  if ! (${call} >/dev/null 2>&1); then
     __tu_pretty_print_test "success" "${fxnName}" "${tstDesc}"
     __tu_increment_successes
   else
@@ -166,7 +162,7 @@ tu_assert_errno () {
   __tu_validate_test_description "${4}"
   local tstDesc="${__test_utils_res}"
   
-  (${call} &>/dev/null)
+  (${call} >/dev/null 2>&1)
   #(${call})
   if [ "${?}" = "${errno}" ]; then
     __tu_pretty_print_test "success" "${fxnName}" "${tstDesc}"
@@ -184,7 +180,7 @@ tu_assert_errno_nr () {
   __tu_validate_errno "${2}"
   local errno="${__test_utils_res}"
   
-  (${call} &>/dev/null)
+  (${call} >/dev/null 2>&1)
   #(${call})
   if [ "${?}" != "${errno}" ]; then
     exit 1
@@ -207,13 +203,11 @@ __tu_validate_call () {
 
 __tu_validate_errno () {
   if [ "${1}" = "" ]; then
-    #log 6 "<error number> wasn't provided"
     printf "<error number> wasn't provided\n"
     exit 1
   fi
   if [ "${1}" -lt 1 ] || [ "${1}" -gt 255 ]; then
-    #log 6 "<error number> '${1}' is invalid.  Must be between 1 and 255"
-    printf "<error number> '${1}' is invalid.  Must be between 1 and 255\n"
+    printf "<error number> '%b' is invalid.  Must be between 1 and 255\n" "${1}"
     exit 1
   fi
   __test_utils_res="${1}"
@@ -221,7 +215,6 @@ __tu_validate_errno () {
 
 __tu_validate_function_name () {
   if [ "${1}" = "" ]; then
-    #log 6 "<function name> wasn't provided"
     printf "<function name> wasn't provided\n"
     exit 1
   fi
@@ -230,7 +223,6 @@ __tu_validate_function_name () {
 
 __tu_validate_test_description () {
   if [ "${1}" = "" ]; then
-    #log 6 "<test description> wasn't provided"
     printf "<test description> wasn't provided\n"
     exit 1
   fi
@@ -247,16 +239,16 @@ __tu_pretty_print_test () {
   local fxnName="${2}"
   local tstDesc="${3}"
   
-  printf "${result}" >&1
+  printf "%b" "${result}" >&1
   if [ "${#fxnName}" -gt 30 ]; then
     # indent four spaces
-    printf "\n    function:    ${fxnName}" >&1
-    printf "\n    description: ${tstDesc}\n" >&1
+    printf "\n    function:    %b" "${fxnName}" >&1
+    printf "\n    description: %b\n" "${tstDesc}" >&1
   else
-    printf "     ${fxnName}" >&1
-    local descIndent=$(( 30 - ${#fxnName} ))
-    printf "%0.s " $(seq 1 ${descIndent}) >&1
-    printf "${tstDesc}\n" >&1
+    printf "     %b" "${fxnName}" >&1
+    local descIndent="$(( 30 - "${#fxnName}" ))"
+    printf "%0.s " "$(seq 1 "${descIndent}")" >&1
+    printf "%b\n" "${tstDesc}" >&1
   fi
 }
 

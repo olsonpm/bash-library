@@ -1,8 +1,4 @@
-#! /bin/bash
-
-#---------------------------#
-# Test file for file_exists #
-#---------------------------#
+#! /usr/bin/env sh
 
 
 #---------#
@@ -10,7 +6,7 @@
 #---------#
 
 if [ -z "${IMPORT_SRC+x}" ]; then
-  source "${LIBRARY_FXNS}/import"
+  . "${LIBRARY_FXNS}/import"
 fi
 import "log"
 import "test_utils"
@@ -25,12 +21,12 @@ tu_init
 test1 () {
   touch .delme
   rm -f "${__log_conf}"
-
+  
   log_print_stdout_level 2>/dev/null 1>.delme
   if [ "$(cat .delme)" != "Current stdout log level: ${__log_res}" ]; then
     exit 1
   fi
-
+  
   rm -f .delme
   rm -f "${__log_conf}"
 }
@@ -46,7 +42,7 @@ test2 () {
   if [ "${__log_res}" != 1 ]; then
     exit 1
   fi
-
+  
   log_set_stdout_level 5
   __log_get_stdout_level
   if [ "${__log_res}" != 5 ]; then
@@ -60,31 +56,32 @@ tu_assert_success "test2" \
 "sets to 1 from no file then 5 with existing file"
 
 test3() {
-  printf "${__log_stdout_name}=1\n" >"${__log_conf}"
-
+  printf "%b=1\n" "${__log_stdout_name}" >"${__log_conf}"
+  
   local msg="this is my log"
   log 1 "${msg}" >.delme
   if [ "$(cat .delme)" != "${__log_trace}: ${msg}" ]; then
     rm -f .delme
     exit 1
   fi
-
-  printf "${__log_stdout_name}=3\n" >"${__log_conf}"
+  
+  printf "%b=3\n" "${__log_stdout_name}" >"${__log_conf}"
   msg="this is my log"
   log 3 "${msg}" >.delme
   if [ "$(cat .delme)" != "${__log_info}: ${msg}" ]; then
     rm -f .delme
     exit 1
   fi
-
-  printf "${__log_stdout_name}=3\n" >"${__log_conf}"
+  
+  
+  printf "%b=3\n" "${__log_stdout_name}" >"${__log_conf}"
   msg="this is my error"
   log 5 "${msg}" 2>.delme
   if [ "$(cat .delme)" != "${__log_error}: ${msg}" ]; then
     rm -f .delme
     exit 1
   fi
-
+  
   rm -f .delme
 }
 
@@ -103,7 +100,7 @@ tu_assert_errno "test4" \
 
 test5 () {
   local msg="this is my fatal"
-  $(log_fatal "${msg}" &>.delme)
+  (log_fatal "${msg}" >.delme)
   local myLog="$(cat .delme)"
   if [ "${myLog##${__log_fatal}: ${msg}*}" ]; then
     exit 1

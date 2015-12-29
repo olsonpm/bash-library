@@ -1,8 +1,4 @@
-#!/bin/bash
-
-#-----------------------------------------------------#
-# This file is intended to be included within scripts #
-#-----------------------------------------------------#
+#! /usr/bin/env sh
 
 
 #------#
@@ -57,10 +53,10 @@ __import_dbg_print "entering import"
 
 import () {
   local file="${1}"
-
+  
   if [ ! -f "${IMPORT_DIR}/${file}.sh" ]; then
     local msg="Import '${1}' failed - file '${IMPORT_DIR}/${file}.sh' was not found\n"
-
+    
     # The below code is copied from log-fatal.  Unable to import it because that
     #   would create a circular reference
     printf "%bError:%b\n\n" "${RED}" "${RESET} ${msg}" >&2
@@ -68,7 +64,7 @@ import () {
     printf "https://github.com/olsonpm/lilyvm/issues/new\n" >&2
     exit 1
   fi
-
+  
   local src=$(basename "${file}" | tr '[:lower:]' '[:upper:]' | tr '-' '_' )"_SRC"
   eval src=\$$src
   if [ "${src}" != 1 ]; then

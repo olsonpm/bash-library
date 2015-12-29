@@ -1,11 +1,11 @@
-#! /bin/bash
+#! /usr/bin/env sh
 
 #---------#
 # Imports #
 #---------#
 
 if [ -z "${IMPORT_SRC+x}" ]; then
-  source "${LIBRARY_FXNS}/import"
+  . "${LIBRARY_FXNS}/import"
 fi
 import "log"
 
@@ -35,24 +35,24 @@ while getopts ":ps:h" opt; do
   case $opt in
     p)
       log_print_stdout_level
-      ;;
+    ;;
     h)
       usage 1
       exit 0
-      ;;
+    ;;
     s)
       log_set_stdout_level "${OPTARG}"
-      ;;
+    ;;
     \?)
       log 5 "Invalid option given: -${OPTARG}"
       usage 2
       exit 1
-      ;;
+    ;;
     :)
       log 5 "Option -${OPTARG} requires an argument"
       usage 2
       exit 2
-      ;;
+    ;;
   esac
 done
 
