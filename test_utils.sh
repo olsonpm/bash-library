@@ -1,13 +1,7 @@
 #! /usr/bin/env sh
 
 
-#------#
-# Init #
-#------#
-
-TEST_UTILS_SRC=
-#log 1 "entering test_utils"
-
+TEST_UTILS_SRC=1
 
 #-----#
 # API #
@@ -118,8 +112,6 @@ tu_assert_success () {
   __tu_validate_test_description "${3}"
   local tstDesc="${__test_utils_res}"
   
-  
-  #if (${call}); then
   if (${call} >/dev/null 2>&1); then
     __tu_pretty_print_test "success" "${fxnName}" "${tstDesc}"
     __tu_increment_successes
@@ -139,7 +131,6 @@ tu_assert_error () {
   __tu_validate_test_description "${3}"
   local tstDesc="${__test_utils_res}"
   
-  #if ! (${call}); then
   if ! (${call} >/dev/null 2>&1); then
     __tu_pretty_print_test "success" "${fxnName}" "${tstDesc}"
     __tu_increment_successes
@@ -163,7 +154,6 @@ tu_assert_errno () {
   local tstDesc="${__test_utils_res}"
   
   (${call} >/dev/null 2>&1)
-  #(${call})
   if [ "${?}" = "${errno}" ]; then
     __tu_pretty_print_test "success" "${fxnName}" "${tstDesc}"
     __tu_increment_successes
@@ -181,7 +171,6 @@ tu_assert_errno_nr () {
   local errno="${__test_utils_res}"
   
   (${call} >/dev/null 2>&1)
-  #(${call})
   if [ "${?}" != "${errno}" ]; then
     exit 1
   fi
@@ -194,7 +183,6 @@ tu_assert_errno_nr () {
 
 __tu_validate_call () {
   if [ "${1}" = "" ]; then
-    #log 6 "<call> wasn't provided"
     printf "<call> wasn't provided\n"
     exit 1
   fi
@@ -239,15 +227,16 @@ __tu_pretty_print_test () {
   local fxnName="${2}"
   local tstDesc="${3}"
   
-  printf "%b" "${result}" >&1
-  if [ "${#fxnName}" -gt 30 ]; then
+  printf "%b" "${result}"
+  if [ ${#fxnName} -gt "30" ]; then
     # indent four spaces
-    printf "\n    function:    %b" "${fxnName}" >&1
-    printf "\n    description: %b\n" "${tstDesc}" >&1
+    printf "\n    function:    %b" "${fxnName}"
+    printf "\n    description: %b\n" "${tstDesc}"
   else
-    printf "     %b" "${fxnName}" >&1
-    local descIndent="$(( 30 - "${#fxnName}" ))"
-    printf "%0.s " "$(seq 1 "${descIndent}")" >&1
+    printf "     %b" "${fxnName}"
+    local descIndent="$(( 30 - ${#fxnName} ))"
+    # shellcheck disable=SC2046
+    printf "%0.s " $(seq 1 ${descIndent})
     printf "%b\n" "${tstDesc}" >&1
   fi
 }

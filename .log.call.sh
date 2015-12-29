@@ -5,7 +5,7 @@
 #---------#
 
 if [ -z "${IMPORT_SRC+x}" ]; then
-  . "${LIBRARY_FXNS}/import"
+  . "$( cd "$( dirname "${0}" )" && pwd )/import.sh"
 fi
 import "log"
 

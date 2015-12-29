@@ -1,18 +1,11 @@
 #! /usr/bin/env sh
 
 
+IMPORT_SRC=1
+
 #------#
 # Init #
 #------#
-
-IMPORT_SRC=
-__import_dbg_enabled=0
-IMPORT_DIR="$( cd "$( dirname "${0}" )" && pwd )"
-
-
-#---------#
-# Imports #
-#---------#
 
 __import_dbg_print () {
   msg="${1}"
@@ -21,6 +14,8 @@ __import_dbg_print () {
   fi
 }
 __import_dbg_print "entering import"
+__import_dbg_enabled=0
+IMPORT_DIR="$( cd "$( dirname "${0}" )" && pwd )"
 
 
 #-----#

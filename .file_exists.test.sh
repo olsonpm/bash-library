@@ -1,13 +1,30 @@
 #! /usr/bin/env sh
 
 
+#---------#
+# Imports #
+#---------#
+
+currentDir="$( cd "$( dirname "${0}" )" && pwd )"
 if [ -z "${IMPORT_SRC+x}" ]; then
-  . "${LIBRARY_FXNS}/import"
+  . "${currentDir}/import.sh"
 fi
 import "file_exists"
 import "test_utils"
 
+
+#------#
+# Init #
+#------#
+
+testFile="${currentDir}/.file_exists.test"
+touch "${testFile}"
 tu_init
+
+
+#------#
+# Main #
+#------#
 
 tu_assert_success "file_exists ./.file_exists.test" "file_exists" "file does exist"
 tu_assert_errno "file_exists ./.file_exists.nothere" \
@@ -21,3 +38,10 @@ tu_assert_errno "file_exists" \
 "no arguments"
 
 tu_finalize
+
+
+#---------#
+# Cleanup #
+#---------#
+
+rm "${testFile}"

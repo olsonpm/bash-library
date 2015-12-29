@@ -1,11 +1,23 @@
 #! /usr/bin/env sh
 
 
+CONFIG_UTILS_SRC=1
+
+#---------#
+# Imports #
+#---------#
+
+if [ -z "${IMPORT_SRC+x}" ]; then
+  . "$( cd "$( dirname "${0}" )" && pwd )/import.sh"
+fi
+import "file_exists"
+import "log"
+
+
 #------#
 # Init #
 #------#
 
-CONFIG_UTILS_SRC=
 __cu_debug_enabled=0
 __cu_debug_print () {
   local msg="${1}"
@@ -14,16 +26,6 @@ __cu_debug_print () {
   fi
 }
 __cu_debug_print "entering config_utils"
-
-#---------#
-# Imports #
-#---------#
-
-if [ -z "${IMPORT_SRC+x}" ]; then
-  . "${import_default_home}/import"
-fi
-import "file_exists"
-import "log"
 
 
 #-----#
@@ -129,11 +131,11 @@ cu_get_value () {
   
   while [ "$#" != 1 ]; do
     if [ ! ${2##file=*} ]; then
-      file="$(printf "%b" "${2}" | sed -e 's/^file=(.*)$/\1/g')"
+      file="$(printf "%b" "${2}" | sed -e 's/^file=\(.*\)$/\1/g')"
       __cu_validate_optional_file "${file}"
       file="${__config_utils_res}"
       elif [ ! ${2##throw-error=*} ]; then
-      throw="$(printf "%b" "${2}" | sed -e 's/^throw-error=(.*)$/\1/g')"
+      throw="$(printf "%b" "${2}" | sed -e 's/^throw-error=\(.*\)$/\1/g')"
       __cu_validate_throw "${throw}"
       throw="${__config_utils_res}"
     else #improper argument supplied

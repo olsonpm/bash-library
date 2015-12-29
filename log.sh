@@ -1,11 +1,23 @@
 #! /usr/bin/env sh
 
 
+LOG_SRC=1
+
+#---------#
+# Imports #
+#---------#
+
+currentDir="$( cd "$( dirname "${0}" )" && pwd )"
+if [ -z "${IMPORT_SRC+x}" ]; then
+  . "/import.sh"
+fi
+import "config_utils"
+
+
 #------#
 # Init #
 #------#
 
-LOG_SRC=
 __log_debug_enabled=0
 __log_debug_print () {
   local msg="${1}"
@@ -14,16 +26,6 @@ __log_debug_print () {
   fi
 }
 __log_debug_print "entering log"
-
-
-#---------#
-# Imports #
-#---------#
-
-if [ -z "${IMPORT_SRC+x}" ]; then
-  . "${LIBRARY_FXNS}/import"
-fi
-import "config_utils"
 
 
 #-----#
@@ -110,7 +112,7 @@ __log_error="error"
 __log_fatal="fatal"
 __log_dbg_enabled=1
 __log_res=
-__log_conf="${LIBRARY_FXNS}/.log.conf"
+__log_conf="${currentDir}/.log.conf"
 __log_stdout_name="stdout_level"
 
 
@@ -207,7 +209,7 @@ __log_validate_message () {
     exit 1
   fi
   
-  __log_res="${1}"
+  __log_res="${2}"
 }
 
 __log_validate_errno () {

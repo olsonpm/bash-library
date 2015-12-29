@@ -1,11 +1,22 @@
 #! /usr/bin/env sh
 
 
+FILE_EXISTS_SRC=1
+
+#---------#
+# Imports #
+#---------#
+
+if [ -z "${IMPORT_SRC+x}" ]; then
+  . "$( cd "$( dirname "${0}" )" && pwd )/import.sh"
+fi
+import "log"
+
+
 #------#
 # Init #
 #------#
 
-FILE_EXISTS_SRC=
 __fe_debug_enabled=0
 __fe_debug_print () {
   local msg="${1}"
@@ -14,16 +25,6 @@ __fe_debug_print () {
   fi
 }
 __fe_debug_print "entering file_exists"
-
-
-#---------#
-# Imports #
-#---------#
-
-if [ -z "${IMPORT_SRC+x}" ]; then
-  . "${LIBRARY_FXNS}/import"
-fi
-import "log"
 
 
 #-----#
