@@ -7,7 +7,7 @@ FILE_EXISTS_SRC=1
 # Imports #
 #---------#
 
-import "log"
+import log
 
 
 #------#

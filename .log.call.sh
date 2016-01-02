@@ -7,7 +7,7 @@
 if [ -z "${IMPORT_SRC+x}" ]; then
   . "$( cd "$( dirname "${0}" )" && pwd )/import.sh"
 fi
-import "log"
+import log
 
 log 1 "entering .log.call"
 

@@ -7,8 +7,8 @@ CONFIG_UTILS_SRC=1
 # Imports #
 #---------#
 
-import "file_exists"
-import "log"
+import file-exists
+import log
 
 
 #------#

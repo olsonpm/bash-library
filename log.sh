@@ -8,7 +8,7 @@ LOG_SRC=1
 #---------#
 
 currentDir="$( cd "$( dirname "${0}" )" && pwd )"
-import "config_utils"
+import config-utils
 
 
 #------#

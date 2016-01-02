@@ -9,8 +9,8 @@ currentDir="$( cd "$( dirname "${0}" )" && pwd )"
 if [ -z "${IMPORT_SRC+x}" ]; then
   . "${currentDir}/import.sh"
 fi
-import "file_exists"
-import "test_utils"
+import file-exists
+import test-utils
 
 
 #------#

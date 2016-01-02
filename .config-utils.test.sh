@@ -8,8 +8,8 @@
 if [ -z "${IMPORT_SRC+x}" ]; then
   . "$( cd "$( dirname "${0}" )" && pwd )/import.sh"
 fi
-import "config_utils"
-import "test_utils"
+import config-utils
+import test-utils
 
 
 #------------#
