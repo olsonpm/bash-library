@@ -8,9 +8,6 @@ LOG_SRC=1
 #---------#
 
 currentDir="$( cd "$( dirname "${0}" )" && pwd )"
-if [ -z "${IMPORT_SRC+x}" ]; then
-  . "${currentDir}/import.sh"
-fi
 import "config_utils"
 
 

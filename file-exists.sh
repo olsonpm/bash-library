@@ -7,9 +7,6 @@ FILE_EXISTS_SRC=1
 # Imports #
 #---------#
 
-if [ -z "${IMPORT_SRC+x}" ]; then
-  . "$( cd "$( dirname "${0}" )" && pwd )/import.sh"
-fi
 import "log"
 
 

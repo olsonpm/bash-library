@@ -7,12 +7,7 @@ TEST_UTILS_SRC=1
 # Imports #
 #---------#
 
-currentDir="$( cd "$( dirname "${0}" )" && pwd )"
-if [ -z "${IMPORT_SRC+x}" ]; then
-  . "${currentDir}/import.sh"
-fi
 import colors
-
 
 
 #-----#
